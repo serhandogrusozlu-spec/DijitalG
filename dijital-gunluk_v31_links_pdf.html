@@ -1,0 +1,1001 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dijital Günlük • Birleşik (Kapak + Defter) — v4</title>
+<link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#26313a;
+    --ink-soft:#2b3640;
+    --accent:#b91c1c;
+    --paper:#fbf7e9;
+    --paper2:#fffaf0;
+    --shadow: rgba(0,0,0,.35);
+    --muted:#5b616a;
+    --ui-font: 15px/1.5 ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    --hand-font: "Reenie Beanie", cursive;
+    --marker-yellow: rgba(255, 244, 129, .6);
+    --marker-green: rgba(173, 255, 175, .45);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%}
+
+  /* ====== INTRO / COVER (dark background) ====== */
+  body{
+    font: var(--ui-font);
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 800px at 10% -10%, rgba(139, 69, 19, .15), transparent 55%),
+      radial-gradient(900px 600px at 90% 110%, rgba(101, 67, 33, .12), transparent 50%),
+      repeating-linear-gradient(90deg, rgba(101, 67, 33, .18) 0 3px, rgba(139, 69, 19, .14) 3px 6px, rgba(160, 82, 45, .1) 6px 9px, rgba(205, 133, 63, .12) 9px 12px),
+      linear-gradient(180deg, #3e2723, #2e1509);
+    background-attachment: fixed;
+    overflow: hidden;
+  }
+  .room-bg{
+    background: radial-gradient(1000px 600px at 50% -10%, rgba(0,0,0,.06), transparent 60%),
+                linear-gradient(180deg, #ecebe6, #e4e2db);
+    background-attachment: fixed;
+  }
+
+  /* ====== WALNUT DESK PANEL (smaller, centered) ====== */
+  .desk{
+    max-width: 1160px;
+    margin: 28px auto 40px;
+    padding: 28px 22px 36px;
+    border-radius: 24px;
+    position: relative;
+    /* realistic walnut: base + grain + pores + plank seams */
+    background:
+      /* plank seams every 220px, hairline dark */
+      linear-gradient(90deg, rgba(20,10,5,.22) 0 1px, transparent 1px 220px),
+      /* long grain bands */
+      repeating-linear-gradient(90deg,
+        rgba(92,56,36,.35) 0 5px,
+        rgba(123,78,50,.25) 5px 12px,
+        rgba(92,56,36,.32) 12px 16px,
+        rgba(143,94,62,.22) 16px 24px
+      ),
+      /* vertical fine pores */
+      repeating-linear-gradient(0deg,
+        rgba(0,0,0,.06) 0 2px,
+        rgba(255,255,255,.03) 2px 4px
+      ),
+      /* base walnut tone */
+      linear-gradient(180deg, #8a5a3b, #5a3a23);
+    background-size:
+      220px 100%,
+      180px 100%,
+      100% 12px,
+      100% 100%;
+    background-blend-mode: multiply, normal, overlay, normal;
+    box-shadow:
+      0 26px 60px rgba(0,0,0,.28),
+      0 10px 24px rgba(0,0,0,.18),
+      inset 0 0 40px rgba(0,0,0,.08);
+  }
+  /* soft vignette & highlight on wood */
+  .desk::before{
+    content:''; position:absolute; inset:-2px; border-radius: 24px;
+    background:
+      radial-gradient(800px 300px at 50% 8%, rgba(255,255,255,.18), transparent 60%),
+      radial-gradient(1200px 500px at 50% 100%, rgba(0,0,0,.16), transparent 65%);
+    pointer-events:none; mix-blend-mode: soft-light;
+  }
+
+  /* ====== Under-notebook shadow (restored) ====== */
+  .notebook-wrap{ position:relative; }
+  .notebook-wrap::before{
+    content:''; position:absolute; left:3%; right:3%; top:12px; height:24px;
+    filter: blur(18px);
+    background: radial-gradient(60% 100% at 50% 50%, rgba(0,0,0,.35), transparent 70%);
+    z-index:0;
+  }
+
+  .intro-container {
+    position: fixed;
+    inset:0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    background: transparent;
+  }
+  .book-intro { position: relative; width: 400px; height: 300px; perspective: 1000px; animation: bookFloat 3s ease-in-out infinite alternate; }
+  @keyframes bookFloat { 0% { transform: translateY(0) rotateY(-5deg); } 100% { transform: translateY(-10px) rotateY(5deg); } }
+  .book-cover {
+    position: absolute; inset:0;
+    background:
+      linear-gradient(135deg, rgba(0,0,0,.4) 0%, transparent 40%),
+      linear-gradient(225deg, rgba(255,255,255,.1) 0%, transparent 30%),
+      linear-gradient(180deg, #8B4513, #654321);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.6), inset 0 2px 10px rgba(255,255,255,.2), inset 0 -2px 10px rgba(0,0,0,.3);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transform-style: preserve-3d;
+  }
+  .book-title { font-family: var(--hand-font); font-size: 38px; color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0,0,0,.8); margin-bottom: 10px; text-align: center; line-height: 1.2; }
+  .book-subtitle { font-size: 14px; color: #d4af84; text-shadow: 1px 1px 2px rgba(0,0,0,.6); font-weight: 600; letter-spacing: 1px; margin-bottom: 20px; }
+  .ornament { width: 80px; height: 2px; background: linear-gradient(90deg, transparent, #d4af84, transparent); margin: 15px 0; position: relative; }
+  .ornament::before, .ornament::after { content: '❋'; position: absolute; top: -8px; color: #d4af84; font-size: 16px; }
+  .ornament::before { left: -10px; } .ornament::after { right: -10px; }
+  .enter-btn {
+    background: linear-gradient(180deg, #f4e4bc, #d4af84);
+    color: #3e2723;
+    border: 2px solid #8B4513;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-family: var(--hand-font);
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,.3), inset 0 1px 3px rgba(255,255,255,.5);
+    margin-top: 30px; position: relative; overflow: hidden;
+  }
+  .enter-btn:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,.4), inset 0 1px 3px rgba(255,255,255,.7); }
+  .enter-btn::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,.3) 50%, transparent 70%);
+    transform: rotate(45deg); transition: all 0.6s; opacity: 0;
+  }
+  .enter-btn:hover::before { animation: shine 0.6s ease-in-out; }
+  @keyframes shine { 0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; } }
+
+  .particle { position: absolute; width: 4px; height: 4px; background: #d4af84; border-radius: 50%; opacity: 0; animation: float 8s infinite linear; }
+  @keyframes float { 0% { transform: translateY(100vh) translateX(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-20px) translateX(100px); opacity: 0; } }
+
+  .intro-container.fade-out { animation: fadeOut 1.2s ease-out forwards; }
+  @keyframes fadeOut { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.8); pointer-events: none; } }
+  .author { position: absolute; bottom: 30px; right: 40px; font-family: var(--hand-font); font-size: 18px; color: #d4af84; opacity: 0.7; transform: rotate(-3deg); }
+  .ambient-light { position: absolute; top: 20%; left: 20%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(212, 175, 132, .1) 0%, transparent 70%); border-radius: 50%; animation: pulse 4s ease-in-out infinite alternate; }
+  @keyframes pulse { 0% { transform: scale(1) opacity(0.3); } 100% { transform: scale(1.2) opacity(0.1); } }
+  @media(max-width: 600px) { .book-intro { width: 300px; height: 220px; } .book-title { font-size: 28px; } .enter-btn { padding: 12px 24px; font-size: 20px; } }
+
+  /* ====== APP (notebook UI) ====== */
+  header{
+    position:sticky; top:0; z-index:50; backdrop-filter: blur(8px);
+    background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.65));
+    border-bottom: 1px solid rgba(0,0,0,.08);
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+  }
+  .hwrap{max-width:1200px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px}
+  .brand{display:flex; align-items:center; gap:10px}
+  .logo{width:26px; height:26px; border-radius:6px; background: radial-gradient(circle at 30% 30%, #fff, #ffeccc 35%, #e7c78f); border:1px solid rgba(0,0,0,.15); box-shadow: inset 0 2px 3px rgba(255,255,255,.6), 0 2px 5px rgba(0,0,0,.25); position:relative;}
+  .logo::after{content:'✍️'; position:absolute; inset:0; display:grid; place-items:center; font-size:16px}
+  h1{font-size:18px; font-weight:900}
+  .toolbar{display:flex; flex-wrap:wrap; gap:8px}
+  .btn{display:inline-flex; align-items:center; gap:8px; padding:12px 16px; border-radius:14px; cursor:pointer; border:1px solid rgba(0,0,0,.18); background: linear-gradient(180deg, #fff, #f1f5f9); color:#0f172a; font-weight:700; box-shadow:0 1px 0 #fff inset, 0 2px 6px rgba(0,0,0,.12); transition:.18s transform; text-decoration:none; font-family: var(--hand-font); font-size:24px;}
+  .btn:hover{transform: translateY(-2px)}
+  .btn-primary{background: linear-gradient(180deg, #0ea5e9, #0284c7); color:#e6f4ff; border-color:#0369a1}
+  .btn-danger{background: linear-gradient(180deg, #ef4444, #dc2626); color:#ffecec; border-color:#b91c1c}
+
+  main{max-width:1200px; margin:16px auto; padding:0 16px}
+
+  /* Wrap adds the under-shadow */
+  .notebook{
+    position:relative; display:grid; grid-template-columns: 1fr 1fr; gap:0;
+    border-radius:18px; overflow:hidden;
+    box-shadow:0 20px 50px var(--shadow), 0 8px 24px rgba(0,0,0,.25);
+    transform-style:preserve-3d;
+    background:#1b1b1b;
+    z-index:1;
+  }
+  @keyframes bookOpen{0%{transform: perspective(1400px) rotateY(14deg) translateY(12px) scale(.98); opacity:0}60%{transform: perspective(1400px) rotateY(-3deg) translateY(0) scale(1.01); opacity:1}100%{transform: perspective(1400px) rotateY(0) scale(1)}}
+
+  /* Flip animation when theme changes */
+  .flip-once{
+    animation: flipOnce 620ms cubic-bezier(.2,.8,.2,1);
+    transform-style:preserve-3d;
+  }
+  @keyframes flipOnce{
+    0%{ transform: perspective(1400px) rotateY(0deg); }
+    40%{ transform: perspective(1400px) rotateY(-12deg); }
+    100%{ transform: perspective(1400px) rotateY(0deg); }
+  }
+
+  .spine{position:absolute; left:50%; transform:translateX(-50%); top:0; bottom:0; width:42px; background:linear-gradient(90deg, rgba(0,0,0,.4), rgba(255,255,255,.05) 25%, rgba(0,0,0,.35) 50%, rgba(255,255,255,.08) 75%, rgba(0,0,0,.5)), linear-gradient(180deg, #6b4e2f, #3f2c1d); box-shadow: inset 0 0 20px rgba(0,0,0,.4), 0 0 0 2px rgba(0,0,0,.2); z-index:2}
+  .stitches{position:absolute; left:50%; transform: translateX(-50%); top:12px; bottom:12px; width:6px; border-radius:3px; background: repeating-linear-gradient(180deg, rgba(255,255,255,.85) 0 6px, rgba(0,0,0,.15) 6px 12px); filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); z-index:3}
+  .ribbon{position:absolute; top:0; left:calc(50% - 4px); width:8px; height:110px; background: linear-gradient(180deg, #f87171, #b91c1c); z-index:4; filter: drop-shadow(0 2px 2px rgba(0,0,0,.3));}
+  .ribbon::after{content:''; position:absolute; bottom:-10px; left:0; border-left:4px solid transparent; border-right:4px solid transparent; border-top:10px solid #7f1d1d}
+
+  .page{ position:relative; padding:20px; overflow:auto; min-height:72vh; will-change:background; background: var(--paper); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+  .page.left{border-right:1px solid rgba(0,0,0,.08)}
+  .page.right{border-left:1px solid rgba(0,0,0,.08)}
+
+  .page::after{ content:''; position:absolute; inset:0; background:
+      radial-gradient(800px 400px at 20% 0%, rgba(0,0,0,.04), transparent 60%),
+      radial-gradient(600px 300px at 80% 100%, rgba(0,0,0,.04), transparent 60%),
+      linear-gradient(180deg, transparent, rgba(0,0,0,.03) 40%, rgba(0,0,0,.06) 100%); pointer-events:none; mix-blend-mode:multiply; }
+
+  .page.left::before, .page.right::before{content:''; position:absolute; top:0; bottom:0; width:30px}
+  .page.left::before{ right:-1px; background: linear-gradient(90deg, rgba(0,0,0,.18), transparent) }
+  .page.right::before{ left:-1px; background: linear-gradient(270deg, rgba(0,0,0,.18), transparent) }
+
+  .corner-curl{ position:absolute; right:0; bottom:0; width:120px; height:120px; pointer-events:none;
+    background: radial-gradient(120px 120px at 100% 100%, rgba(0,0,0,.18), rgba(0,0,0,.05) 45%, transparent 60%);
+    clip-path: polygon(40% 60%, 100% 0, 100% 100%, 0 100%); opacity:.6;
+  }
+
+  .hand{font-family: var(--hand-font); font-size: 22px; line-height: 1.35; color:var(--ink); text-shadow: 0 .25px rgba(0,0,0,.25);}
+  .hand.small{font-size: 20px}
+  .page.right .hint{font-size:24px; letter-spacing:.1px; color:#374151}
+  .page.right .small{font-size:24px; color:#374151}
+  .page.left .hand{font-size:24px; line-height:1.45}
+  .page.left .hint{font-size:24px; letter-spacing:.2px; color:#2d3748}
+
+  input[type="text"], input[type="date"], input[type="time"], textarea{
+    width:100%; padding:6px 6px; border-radius:0; background: transparent; border:none; outline:none;
+    border-bottom: 1px dashed rgba(0,0,0,.15);
+    color:var(--ink); font: inherit; transition:.15s;
+  }
+  textarea{min-height:92px; resize:vertical}
+  input:focus, textarea:focus{ border-bottom-color:#0284c7; box-shadow: 0 1px 0 0 #0284c7 }
+
+  .theme-lined .page.left{
+    background-image:
+      radial-gradient(800px 400px at 20% 0%, rgba(0,0,0,.03), transparent 60%),
+      radial-gradient(600px 300px at 80% 100%, rgba(0,0,0,.03), transparent 60%),
+      linear-gradient(90deg, transparent 22%, var(--accent) 22.5%, transparent 23%),
+      repeating-linear-gradient(180deg, transparent 0 32px, rgba(0,0,0,.08) 32px 33px),
+      linear-gradient(180deg, var(--paper), var(--paper2));
+  }
+  .theme-lined .page.right{
+    background-image:
+      radial-gradient(800px 400px at 20% 0%, rgba(0,0,0,.03), transparent 60%),
+      radial-gradient(600px 300px at 80% 100%, rgba(0,0,0,.03), transparent 60%),
+      repeating-linear-gradient(180deg, transparent 0 32px, rgba(0,0,0,.08) 32px 33px),
+      linear-gradient(180deg, var(--paper), var(--paper2));
+  }
+
+  .theme-dotted .page.left,
+  .theme-dotted .page.right{
+    background-image:
+      radial-gradient(800px 400px at 20% 0%, rgba(0,0,0,.03), transparent 60%),
+      radial-gradient(600px 300px at 80% 100%, rgba(0,0,0,.03), transparent 60%),
+      radial-gradient(#5f6b75 .7px, transparent .7px);
+    background-size: auto, auto, 28px 28px;
+    background-position: 0 0, 0 0, 0 1.2rem;
+  }
+  .theme-dotted .page.left{
+    background-image:
+      radial-gradient(800px 400px at 20% 0%, rgba(0,0,0,.03), transparent 60%),
+      radial-gradient(600px 300px at 80% 100%, rgba(0,0,0,.03), transparent 60%),
+      linear-gradient(90deg, transparent 22%, var(--accent) 22.5%, transparent 23%),
+      radial-gradient(#5f6b75 .7px, transparent .7px);
+    background-size: auto, auto, auto, 28px 28px;
+    background-position: 0 0, 0 0, 0 0, 0 1.2rem;
+  }
+  .theme-grid .page.left,
+  .theme-grid .page.right{
+    background-image:
+      radial-gradient(800px 400px at 20% 0%, rgba(0,0,0,.03), transparent 60%),
+      radial-gradient(600px 300px at 80% 100%, rgba(0,0,0,.03), transparent 60%),
+      linear-gradient(180deg, rgba(0,0,0,.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,.08) 1px, transparent 1px);
+    background-size: auto, auto, 28px 28px, 28px 28px;
+    background-position: 0 0, 0 0, 0 1.2rem, 0 0;
+  }
+  .theme-grid .page.left{
+    background-image:
+      radial-gradient(800px 400px at 20% 0%, rgba(0,0,0,.03), transparent 60%),
+      radial-gradient(600px 300px at 80% 100%, rgba(0,0,0,.03), transparent 60%),
+      linear-gradient(90deg, transparent 22%, var(--accent) 22.5%, transparent 23%),
+      linear-gradient(180deg, rgba(0,0,0,.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,.08) 1px, transparent 1px);
+    background-size: auto, auto, auto, 28px 28px, 28px 28px;
+    background-position: 0 0, 0 0, 0 0, 0 1.2rem, 0 0;
+  }
+
+  .section-title{font-weight:900; font-size:18px; margin-bottom:6px; position:relative; display:inline-block; padding:0 6px}
+  .section-title.marker-yellow::after{
+    content:''; position:absolute; left:0; right:0; bottom:.05em; height:.65em; background: var(--marker-yellow); z-index:-1;
+    transform: skewX(-6deg);
+  }
+  .section-title.marker-green::after{
+    content:''; position:absolute; left:0; right:0; bottom:.05em; height:.65em; background: var(--marker-green); z-index:-1;
+    transform: skewX(-6deg);
+  }
+
+  .hint{font-size:12px; color:var(--muted)}
+  .grid{display:grid; gap:12px}
+  .row-2{grid-template-columns:1fr 1fr}
+  .row-3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:980px){
+    .notebook{grid-template-columns:1fr}
+    .spine,.stitches,.ribbon{display:none}
+    .row-2,.row-3{grid-template-columns:1fr}
+    .desk{padding:18px 12px 26px}
+  }
+
+  .note{position:relative; padding:12px; background: linear-gradient(180deg, #fff, #faf7f2); border:1px solid rgba(0,0,0,.12); border-radius:10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); margin-bottom:12px}
+  .note .pin{position:absolute; top:-8px; left:12px; width:14px; height:14px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #fff, #d0d0d0 60%, #8a8a8a); box-shadow: 0 2px 6px rgba(0,0,0,.25)}
+  .note .title{font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:8px}
+  .note .ico{font-size:18px}
+  .attachment-grid{display:grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap:10px}
+  .attachment-item{display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px dashed rgba(0,0,0,.15); border-radius:10px; background:#fff}
+  .attachment-thumb{width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid rgba(0,0,0,.15)}
+  .date-list{list-style:none}
+  .date-item{padding:10px 12px; border:1px solid rgba(0,0,0,.12); border-radius:10px; background:#fff; margin-bottom:8px; cursor:pointer; transition:.12s}
+  .date-item:hover{transform: translateX(4px); background:#f1f5f9}
+  table{width:100%; border-collapse:collapse; margin-top:8px}
+  th,td{border:1px solid rgba(0,0,0,.12); padding:8px 10px; text-align:left; background:#fff}
+  th{background:#f8fafc}
+  .small{font-size:12px; color:var(--muted)}
+
+  .chipbar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+  .chip{border:1px dashed rgba(0,0,0,.3); background:#fffdf6; padding:4px 10px; border-radius:999px; cursor:pointer; user-select:none}
+  .chip.active{background:#fee2e2; border-color:#991b1b}
+
+  /* sticky paper style  */
+  .note{background: linear-gradient(180deg, #fffef2, #fff9c9); position:relative; box-shadow: 0 16px 26px rgba(0,0,0,.22), 0 6px 12px rgba(0,0,0,.14);}
+  .note::before{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(60px 60px at 100% 0%, rgba(0,0,0,.25), rgba(0,0,0,.12) 40%, transparent 65%) top right / 70px 70px no-repeat,
+      radial-gradient(40px 40px at 0% 100%, rgba(0,0,0,.12), transparent 65%) bottom left / 46px 46px no-repeat,
+      linear-gradient(115deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,0) 12%),
+      linear-gradient(250deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,0) 10%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.03) 0 2px, rgba(255,255,255,0) 2px 4px);
+    opacity:.45; mix-blend-mode:multiply;
+  }
+  .note::after{content:''; position:absolute; inset:0; pointer-events:none;background:linear-gradient(0deg, #555, #555) 12px 8px / 18px 3px no-repeat,linear-gradient(0deg, #555, #555) calc(100% - 30px) 8px / 18px 3px no-repeat,radial-gradient(120px 60px at 20% 10%, rgba(0,0,0,.06), transparent 60%),radial-gradient(140px 70px at 80% 90%, rgba(0,0,0,.05), transparent 60%),repeating-linear-gradient(0deg, rgba(255,255,255,.0) 0 6px, rgba(255,255,255,.25) 6px 7px);mix-blend-mode:multiply; opacity:.35;}
+  .page.right .note:nth-of-type(odd){ transform: rotate(-0.35deg); }
+  .page.right .note:nth-of-type(even){ transform: rotate(0.45deg); }
+
+  .toolbar.sticky{
+    background: linear-gradient(180deg, #fffbe1, #fff6b3);
+    border:none; border-radius:0;
+    box-shadow: 0 10px 18px rgba(0,0,0,.18), 0 4px 8px rgba(0,0,0,.12);
+    padding:12px;
+    clip-path: polygon(3% 0, 97% 0, 100% 8%, 97% 16%, 100% 24%, 97% 32%, 100% 40%, 97% 48%, 100% 56%, 97% 64%, 100% 72%, 97% 80%, 100% 88%, 97% 96%, 97% 100%, 3% 100%, 0 92%, 3% 84%, 0 76%, 3% 68%, 0 60%, 3% 52%, 0 44%, 3% 36%, 0 28%, 3% 20%, 0 12%, 3% 4%);
+  }
+
+  /* White style for Anlat & Raporla buttons */
+  #askBtn, #btnRunReport{
+    background: linear-gradient(180deg, #fff, #f1f5f9) !important;
+    color:#0f172a !important;
+    border-color: rgba(0,0,0,.22) !important;
+  }
+#importBtn{display:none !important}
+</style>
+
+<style id="v10-patch">
+/* Sol sayfa kenarlarını sağ sayfa gibi oval yap */
+.page.left{
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+  overflow: hidden;
+}
+.page.right{
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  overflow: hidden;
+}
+#importBtn{display:none !important}
+</style>
+
+
+<style id="v9-patch">
+/* Sol sayfaya da sağdaki gibi köşe gölgesi/kıvrım efekti */
+.page.left::after{
+  content:'';
+  position:absolute; left:0; bottom:0; width:120px; height:120px; pointer-events:none;
+  background: radial-gradient(120px 120px at 0% 100%, rgba(0,0,0,.18), rgba(0,0,0,.05) 45%, transparent 60%);
+  clip-path: polygon(0 0, 60% 60%, 0 100%, 0 100%);
+  opacity:.6;
+}
+#importBtn{display:none !important}
+</style>
+
+
+<style id="v6-patch">
+/* v6 overrides: açık ahşap masa, daha gerçekçi defter ve güçlü masa gölgesi */
+.desk{
+  /* Açık meşe/huş hissi + ince plank ve damar */
+  background:
+    /* plank ayrımı */
+    linear-gradient(90deg, rgba(110,85,50,.10) 0 1px, transparent 1px 240px),
+    /* uzun damarlar */
+    repeating-linear-gradient(90deg,
+      rgba(180,150,105,.25) 0 6px,
+      rgba(230,210,170,.18) 6px 14px,
+      rgba(180,150,105,.22) 14px 20px,
+      rgba(210,185,140,.18) 20px 28px
+    ),
+    /* ince gözenek/fiber */
+    repeating-linear-gradient(0deg, rgba(0,0,0,.035) 0 2px, rgba(255,255,255,.025) 2px 4px),
+    /* baz ton */
+    linear-gradient(180deg, #f1e6cf, #e6d6b8);
+  background-size: 240px 100%, 220px 100%, 100% 12px, 100% 100%;
+  background-blend-mode: multiply, normal, overlay, normal;
+}
+
+.notebook-wrap::before{
+  /* Defter altındaki gölge daha belirgin ve yayvan */
+  height:34px;
+  filter: blur(26px);
+  background: radial-gradient(60% 100% at 50% 50%, rgba(0,0,0,.42), transparent 72%);
+}
+
+/* Defterin hacmini arttır */
+.notebook{
+  box-shadow: 0 34px 90px rgba(0,0,0,.42), 0 14px 36px rgba(0,0,0,.28);
+}
+
+/* Sayfa açıklığında (göbekte) gölgeyi güçlendir, daha gerçekçi */
+.page.left::before{ right:-1px; background: linear-gradient(90deg, rgba(0,0,0,.24), transparent) }
+.page.right::before{ left:-1px; background: linear-gradient(270deg, rgba(0,0,0,.24), transparent) }
+
+/* Kağıt istifi hissi için çok hafif stack çizgileri */
+.page::after{
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(800px 400px at 20% 0%, rgba(0,0,0,.045), transparent 60%),
+    radial-gradient(600px 300px at 80% 100%, rgba(0,0,0,.045), transparent 60%),
+    repeating-linear-gradient(180deg, rgba(0,0,0,.03) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, transparent, rgba(0,0,0,.035) 40%, rgba(0,0,0,.07) 100%);
+  pointer-events:none; mix-blend-mode:multiply;
+}
+#importBtn{display:none !important}
+</style>
+
+
+<style id="remove-photo-file-patch">
+/* 'Fotoğraf Ekle' ve 'Dosya (Belge) Ekle' alanlarını gizle */
+#photoInput, #photoList,
+#fileInput, #fileList { display:none !important; }
+
+.page.right .note:has(#photoInput),
+.page.right .note:has(#fileInput),
+.page.right .note:has(#photoList),
+.page.right .note:has(#fileList) {
+  display:none !important;
+}
+</style>
+
+
+<style id="remove-reports">
+/* 'Raporlar' notunu tamamen gizle */
+.page.right .note:has(#reportStart){ display:none !important; }
+/* Eski tarayıcılar için başlığa göre de gizlemeyi dene */
+.page.right .note .title:has(.section-title.marker-green:contains("Raporlar")){ display:none !important; }
+#reportStart, #reportEnd, #reportKeyword, #reportContains,
+#btnLastMonth, #btnThisMonth, #btnRunReport, #btnReportCSV,
+#reportSummary, #reportTableWrap { display:none !important; }
+</style>
+
+</head>
+<body class="theme-lined bleed">
+  <!-- INTRO -->
+  <div class="intro-container" id="introContainer">
+    <div class="ambient-light"></div>
+    <div class="book-intro">
+      <div class="book-cover">
+        <div class="book-title">GÜNLÜK</div>
+        <div class="ornament"></div>
+        <div class="book-subtitle">Serhan'ın Dijital Defteri</div>
+        <div class="ornament"></div>
+        <button class="enter-btn" id="enterBtn">✨ Defteri Aç ✨</button>
+      </div>
+    </div>
+    <div class="author">~ S.K. ~</div>
+  </div>
+
+  <!-- DESK PANEL + APP -->
+  <div id="deskWrap" class="desk" style="display:none">
+    <div class="notebook-wrap">
+      
+
+      <main>
+        <div id="book" class="notebook">
+          <div class="spine"></div>
+          <div class="stitches"></div>
+          <div class="ribbon"></div>
+
+          <!-- LEFT PAGE -->
+          <section class="page left">
+            <div class="corner-curl"></div>
+            <div class="chipbar hand">
+              <span class="chip active hand" data-theme="theme-lined">📘 Çizgili</span>
+              <span class="chip hand" data-theme="theme-dotted">📒 Noktalı</span>
+              <span class="chip hand" data-theme="theme-grid">📗 Kareli</span>
+            </div>
+
+            <div class="section-title marker-yellow hand">🗒️ Günlük Kaydı</div>
+            <div class="grid row-3 hand" style="margin-top:6px">
+              <label><div class="hint">Tarih</div><input id="date" type="date" class="hand"></label>
+              <label><div class="hint">Kalkış saati</div><input id="wakeTime" type="time" class="hand"></label>
+              <label><div class="hint">Kahvaltı saati</div><input id="breakfastTime" type="time" class="hand"></label>
+            </div>
+            <div class="grid row-2" style="margin-top:10px">
+              <label class="hand"><div class="hint">Öğle yemeği saati</div><input id="lunchTime" type="time" class="hand"></label>
+              <label class="hand"><div class="hint">Akşam yemeği saati</div><input id="dinnerTime" type="time" class="hand"></label>
+            </div>
+
+
+            <div class="grid row-2" style="margin-top:10px">
+              <label class="hand"><div class="hint">Ne çalıştım? <span class="small">Biçim: 10:00-12:00 yazılım #etiket</span></div>
+                <textarea id="study" class="hand" placeholder="Örn: 10:00–12:00 yazılım; 14:00–15:30 gitar #teknik"></textarea>
+              </label>
+              <label class="hand"><div class="hint">Kiminle görüştüm? (virgülle ayır)</div>
+                <input id="metWith" type="text" class="hand" placeholder="Örn: Funda, Haktan, Usta">
+              </label>
+            </div>
+
+            <div class="grid row-2" style="margin-top:10px">
+              <label class="hand"><div class="hint">Ne izledim?</div><textarea id="watched" class="hand" placeholder="Örn: Belgesel, film, YouTube dersi..."></textarea></label>
+              <label class="hand"><div class="hint">Nerelere gittim?</div><textarea id="locations" class="hand" placeholder="Örn: Stüdyo, Güzelbahçe, Usta"></textarea></label>
+            </div>
+
+            <div class="grid row-3" style="margin-top:10px">
+              <label class="col-span-2 hand"><div class="hint">Notlar</div><textarea id="notes" class="hand" placeholder="Duygular, planlar, hatırlatmalar..."></textarea></label>
+              <label class="hand"><div class="hint">Yatma saati</div><input id="sleepTime" type="time" class="hand"></label>
+            </div>
+
+            
+          
+<div class="entry">
+  <label class="hand">Ne Okudun?</label>
+  <textarea id="reading" class="hand" placeholder="örn: Sabah 20 sayfa kitap okudum" style="height:50px; font-style:italic; color:#777;"></textarea>
+</div>
+
+</section>
+
+          <!-- RIGHT PAGE -->
+          <aside class="page right">
+            <div class="corner-curl"></div>
+
+            <div class="note">
+              <div class="pin"></div>
+              <div class="title hand"><span class="ico">📸</span><span class="section-title marker-green">Fotoğraf Ekle</span></div>
+              <input id="photoInput" type="file" accept="image/*" multiple>
+              <div id="photoList" class="attachment-grid" style="margin-top:8px"></div>
+            </div>
+
+            <div class="note">
+              <div class="pin"></div>
+              <div class="title hand"><span class="ico">📎</span><span class="section-title marker-green">Dosya Ekle</span></div>
+              <input id="fileInput" type="file" multiple>
+              <div id="fileList" class="attachment-grid" style="margin-top:8px"></div>
+            </div>
+
+            <div class="note">
+              <div class="pin"></div>
+              <div class="title hand"><span class="ico">📅</span><span class="section-title marker-green">Kayıtlı Günler</span></div>
+              <ul id="datesList" class="date-list hand"></ul>
+              <div class="small hand" style="margin-top:6px">Eski günlere tıklayıp açabilirsin.</div>
+            </div>
+
+            <div class="note">
+              <div class="pin"></div>
+              <div class="title hand"><span class="ico">🧠</span><span class="section-title marker-green">Asistan — Günü Anlat</span></div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input id="askInput" type="text" class="hand" placeholder='Ör: "9 ağustosumu anlat", "09.08.2025", "2025-08-09"' style="flex:1;">
+                <button id="askBtn" class="btn btn-primary">Anlat</button>
+              </div>
+              <div id="askOutput" class="hand" style="margin-top:8px; background:#fff; border:1px solid rgba(0,0,0,.12); border-radius:10px; padding:10px"></div>
+            </div>
+
+            <div class="note">
+              <div class="pin"></div>
+              <div class="title hand"><span class="ico">📊</span><span class="section-title marker-green">Raporlar</span></div>
+              <div class="grid row-2 hand">
+                <label><div class="hint">Başlangıç</div><input type="date" id="reportStart" class="hand"></label>
+                <label><div class="hint">Bitiş</div><input type="date" id="reportEnd" class="hand"></label>
+              </div>
+              <div class="grid row-2 hand" style="margin-top:8px">
+                <label><div class="hint">Anahtar kelime / #etiket</div><input type="text" id="reportKeyword" class="hand" placeholder="yazılım / #algoritma" value="yazılım"></label>
+                <label><div class="hint">Satır filtre (ops.)</div><input type="text" id="reportContains" class="hand" placeholder="metinde geçmeli"></label>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px">
+                <button id="btnLastMonth" class="btn">Geçen Ay</button>
+                <button id="btnThisMonth" class="btn">Bu Ay</button>
+                <button id="btnRunReport" class="btn btn-primary">Raporla</button>
+                <button id="btnReportCSV" class="btn" style="display:none">Rapor CSV</button>
+              </div>
+              <div id="reportSummary" class="small hand" style="margin-top:6px"></div>
+              <div id="reportTableWrap" style="margin-top:6px; max-height:38vh; overflow:auto"></div>
+            </div>
+          
+<div class="toolbar sticky" style="overflow-x:auto; margin-top:20px; display:flex; flex-wrap:nowrap; gap:10px;"><button class="btn" id="saveBtn">💾 Kayıt</button>
+              <button class="btn" id="clearBtn">🧹 Temizle</button>
+              <button class="btn" id="printBtn">🖨️ PDF</button>
+              <button class="btn btn-danger" id="delBtn">Sil</button>
+              <button class="btn" id="importBtn" style="display:none">📥 Yedek Yükle</button>
+              <input id="importFile" type="file" accept="application/json" style="display:none">
+            </div>
+</aside>
+        </div>
+      </main>
+    </div>
+  </div>
+
+<script>
+  // ===== Intro particles & transition =====
+  function createParticles() {
+    for(let i = 0; i < 20; i++) {
+      setTimeout(() => {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + 'vw';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (8 + Math.random() * 4) + 's';
+        document.body.appendChild(particle);
+        setTimeout(() => { if (particle.parentNode) particle.parentNode.removeChild(particle); }, 12000);
+      }, i * 400);
+    }
+  }
+  createParticles(); setInterval(createParticles, 8000);
+
+  document.getElementById('enterBtn').addEventListener('click', () => {
+    const introContainer = document.getElementById('introContainer');
+    introContainer.classList.add('fade-out');
+    setTimeout(() => {
+      introContainer.style.display = 'none';
+      document.body.classList.add('room-bg');
+      document.body.style.overflow = 'auto';
+      document.getElementById('deskWrap').style.display = 'block';
+      window.scrollTo({top: 0, behavior:'smooth'});
+    }, 1100);
+  });
+
+  // ===== App logic (IndexedDB-based) =====
+  const $ = (sel) => document.querySelector(sel);
+  const todayISO = () => { const d=new Date(); const tz=d.getTimezoneOffset()*60000; return new Date(Date.now()-tz).toISOString().slice(0,10); };
+  const uid = () => 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const pad = (n)=> String(n).padStart(2,'0');
+
+  // Theme chips + flip
+  const chips = () => document.querySelectorAll('.chip');
+  function addFlip(){
+    const nb = document.getElementById('book');
+    nb.classList.remove('flip-once');
+    void nb.offsetWidth; // reflow to restart animation
+    nb.classList.add('flip-once');
+  }
+  function setTheme(theme){
+    document.body.classList.remove('theme-lined','theme-dotted','theme-grid');
+    document.body.classList.add(theme);
+    localStorage.setItem('paper-theme', theme);
+    chips().forEach(c=> c.classList.toggle('active', c.dataset.theme===theme));
+    addFlip(); // bring back the flip effect
+  }
+
+  function parseTime(str){ const m=/^(\\d{1,2}):(\\d{2})$/.exec(str); if(!m) return null; const h=+m[1], mi=+m[2]; if(h<0||h>24||mi<0||mi>59) return null; return h*60+mi; }
+  function diffMinutes(t1,t2){ let d=t2-t1; if(d<0) d+=24*60; return d; }
+  function parseStudyLines(text){
+    const out=[]; if(!text) return out;
+    const lines=text.split(/[\\r\\n]+/).map(s=>s.trim()).filter(Boolean);
+    for(const line of lines){
+      const m=/(\\d{1,2}:\\d{2})\\s*-\\s*(\\d{1,2}:\\d{2})\\s*(.*)?/i.exec(line);
+      if(m){ const start=parseTime(m[1]), end=parseTime(m[2]); const topic=(m[3]||'').trim(); out.push({start,end,topic,line, minutes:diffMinutes(start,end)}); }
+      else{ out.push({start:null,end:null,topic:line,line, minutes:0}); }
+    } return out;
+  }
+
+  const trMonths={"ocak":1,"şubat":2,"subat":2,"mart":3,"nisan":4,"mayıs":5,"mayis":5,"haziran":6,"temmuz":7,"ağustos":8,"agustos":8,"eylül":9,"eylul":9,"ekim":10,"kasım":11,"kasim":11,"aralık":12,"aralik":12};
+  function parseTRDatePhrase(q){
+    if(!q) return null;
+    const s=q.trim().toLowerCase().replace(/[\\u00A0]/g,' ').replace(/günü|gunu|günümü|gunumu|benim|bana|anlat|lütfen|lutfen/gi,'').trim();
+    let m=/^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(s); if(m) return `${m[1]}-${m[2]}-${m[3]}`;
+    m=/^(\\d{1,2})[./-](\\d{1,2})[./-](\\d{4})$/.exec(s); if(m){ const dd=String(+m[1]).padStart(2,'0'); const MM=String(+m[2]).padStart(2,'0'); return `${m[3]}-${MM}-${dd}`; }
+    m=/^(\\d{1,2})\\s+([a-zçğıöşü]+)(?:\\s+(\\d{4}))?$/.exec(s);
+    if(m){ const dd=String(+m[1]).padStart(2,'0'); const mon=trMonths[m[2]]; if(!mon) return null; const MM=String(mon).padStart(2,'0'); const year=m[3]? +m[3]: (new Date().getFullYear()); return `${year}-${MM}-${dd}`; }
+    return null;
+  }
+
+  // IndexedDB
+  const DB_NAME='serhan-journal-db', DB_VERSION=1; let dbPromise=null;
+  function openDB(){ if(dbPromise) return dbPromise; dbPromise=new Promise((resolve,reject)=>{
+    const req=indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded=()=>{ const db=req.result; if(!db.objectStoreNames.contains('entries')) db.createObjectStore('entries',{keyPath:'date'}); if(!db.objectStoreNames.contains('blobs')) db.createObjectStore('blobs',{keyPath:'id'}); };
+    req.onsuccess=()=>resolve(req.result); req.onerror=()=>reject(req.error);
+  }); return dbPromise; }
+  async function txStore(name,mode,fn){ const db=await openDB(); return new Promise((resolve,reject)=>{ const tx=db.transaction(name,mode); const store=tx.objectStore(name); const res=fn(store); tx.oncomplete=()=>resolve(res); tx.onerror=()=>reject(tx.error); }); }
+  const saveEntry=(e)=>txStore('entries','readwrite',s=>s.put(e));
+  const getEntry=(dateStr)=>openDB().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('entries','readonly'); const st=tx.objectStore('entries'); const r=st.get(dateStr); r.onsuccess=()=>res(r.result||null); r.onerror=()=>rej(r.error); }));
+  const getAllDates=()=>openDB().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('entries','readonly'); const st=tx.objectStore('entries'); const r=st.getAllKeys(); r.onsuccess=()=>res(r.result||[]); r.onerror=()=>rej(r.error); }));
+  const deleteEntry=(dateStr)=>txStore('entries','readwrite',s=>s.delete(dateStr));
+  const saveBlob=(id,blob)=>txStore('blobs','readwrite',s=>s.put({id,blob}));
+  const getBlob=(id)=>openDB().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('blobs','readonly'); const st=tx.objectStore('blobs'); const r=st.get(id); r.onsuccess=()=>res(r.result? r.result.blob:null); r.onerror=()=>rej(r.error); }));
+
+  async function exportAll(){ const db=await openDB(); return new Promise((resolve,reject)=>{
+    const out={entries:[],blobs:[]}; const tx=db.transaction(['entries','blobs'],'readonly');
+    tx.objectStore('entries').getAll().onsuccess=(e)=>{ out.entries=e.target.result||[]; };
+    tx.objectStore('blobs').getAll().onsuccess=async (e)=>{
+      const items=e.target.result||[];
+      const convert=(rec)=>new Promise((rv)=>{ const fr=new FileReader(); fr.onload=()=>rv({id:rec.id,dataUrl:fr.result}); fr.readAsDataURL(rec.blob); });
+      (async()=>{ const arr=[]; for(const rec of items){ arr.push(await convert(rec)); } out.blobs=arr; })();
+    };
+    tx.oncomplete=()=>resolve(out); tx.onerror=()=>reject(tx.error);
+  }); }
+  async function importAll(data){ const db=await openDB(); return new Promise((resolve,reject)=>{
+    const tx=db.transaction(['entries','blobs'],'readwrite'); const eStore=tx.objectStore('entries'); const bStore=tx.objectStore('blobs');
+    (data.entries||[]).forEach(e=>eStore.put(e));
+    (data.blobs||[]).forEach(b=>{ fetch(b.dataUrl).then(r=>r.blob()).then(blob=>bStore.put({id:b.id, blob})); });
+    tx.oncomplete=()=>resolve(true); tx.onerror=()=>reject(tx.error);
+  }); }
+
+  // UI refs
+  const dateInput=$('#date'), wakeInput=$('#wakeTime'), breakfastInput=$('#breakfastTime'), studyInput=$('#study'),
+        metInput=$('#metWith'), watchedInput=$('#watched'), locationsInput=$('#locations'), sleepInput=$('#sleepTime'), notesInput=$('#notes'),
+        photoInput=$('#photoInput'), fileInput=$('#fileInput'), photoList=$('#photoList'), fileList=$('#fileList'),
+        saveBtn=$('#saveBtn'), printBtn=$('#printBtn'), delBtn=$('#delBtn'), csvBtn=$('#csvBtn'), importBtn=$('#importBtn'), importFile=$('#importFile'),
+        datesList=$('#datesList');
+        const lunchInput=$('#lunchTime'), dinnerInput=$('#dinnerTime');
+  const askInput=$('#askInput'), askBtn=$('#askBtn'), askOutput=$('#askOutput');
+  const reportStart=$('#reportStart'), reportEnd=$('#reportEnd'), reportKeyword=$('#reportKeyword'), reportContains=$('#reportContains'),
+        btnLastMonth=$('#btnLastMonth'), btnThisMonth=$('#btnThisMonth'), btnRunReport=$('#btnRunReport'), btnReportCSV=$('#btnReportCSV'),
+        reportSummary=$('#reportSummary'), reportTableWrap=$('#reportTableWrap');
+
+  let current=null;
+
+  async function loadDates(){ const dates=(await getAllDates()).sort().reverse(); datesList.innerHTML=''; dates.forEach(d=>{ const li=document.createElement('li'); li.className='date-item hand'; li.textContent=d; li.onclick=()=>{ loadDate(d); }; datesList.appendChild(li); }); }
+  async function loadDate(d){
+    const e=await getEntry(d); current=e||{date:d, photos:[], files:[]};
+    dateInput.value=current.date; wakeInput.value=current.wakeTime||''; breakfastInput.value=current.breakfastTime||''; lunchInput.value=current.lunchTime||''; dinnerInput.value=current.dinnerTime||'';
+    studyInput.value=current.study||''; metInput.value=(current.metWith||[]).join(', '); watchedInput.value=current.watched||'';
+    locationsInput.value=current.locations||''; sleepInput.value=current.sleepTime||''; notesInput.value=current.notes||'';
+    await renderAttachments();
+  }
+  async function renderAttachments(){
+    photoList.innerHTML=''; fileList.innerHTML='';
+    for(const p of (current.photos||[])){
+      const wrap=document.createElement('div'); wrap.className='attachment-item hand';
+      const img=document.createElement('img'); img.className='attachment-thumb'; img.alt=p.name; const blob=await getBlob(p.id); const url=URL.createObjectURL(blob); img.src=url;
+      const name=document.createElement('div'); name.textContent=p.name; name.style.fontSize='18px';
+      const del=document.createElement('button'); del.className='btn'; del.textContent='Sil'; del.onclick=()=>removePhoto(p.id);
+      wrap.append(img,name,del); photoList.appendChild(wrap);
+    }
+    for(const f of (current.files||[])){
+      const wrap=document.createElement('div'); wrap.className='attachment-item hand';
+      const icon=document.createElement('div'); icon.textContent='📄'; icon.style.fontSize='20px';
+      const name=document.createElement('div'); name.textContent=f.name; name.style.fontSize='18px';
+      const a=document.createElement('a'); a.href='#'; a.className='btn'; a.textContent='İndir'; a.style.marginLeft='auto';
+      a.onclick=async (e)=>{ e.preventDefault(); const blob=await getBlob(f.id); const url=URL.createObjectURL(blob); const link=document.createElement('a'); link.href=url; link.download=f.name; link.click(); setTimeout(()=>URL.revokeObjectURL(url), 1000); };
+      const del=document.createElement('button'); del.className='btn'; del.textContent='Sil'; del.onclick=()=>removeFile(f.id);
+      wrap.append(icon,name,a,del); fileList.appendChild(wrap);
+    }
+  }
+
+  async function onSave(){
+    const entry={ date: dateInput.value||todayISO(), wakeTime:wakeInput.value||'', breakfastTime:breakfastInput.value||'', study:studyInput.value||'',
+      metWith: metInput.value? metInput.value.split(',').map(s=>s.trim()).filter(Boolean):[], watched:watchedInput.value||'', locations:locationsInput.value||'',
+      lunchTime:lunchInput.value||'', dinnerTime:dinnerInput.value||'', sleepTime:sleepInput.value||'', notes:notesInput.value||'', photos: current?.photos||[], files: current?.files||[], savedAt: new Date().toISOString() };
+    await saveEntry(entry); current=entry; await loadDates();
+  }
+  async function removePhoto(id){ current.photos=(current.photos||[]).filter(x=>x.id!==id); await saveEntry(current); await renderAttachments(); }
+  async function removeFile(id){ current.files=(current.files||[]).filter(x=>x.id!==id); await saveEntry(current); await renderAttachments(); }
+  
+  
+  // Saat sonuna eklenen 'de/te' ekini basitçe seç (00-24 arası saatlerde 0,1,2,3,4,5,6,7,8,9'a göre)
+  function fixSuffix(hhmm, phrase){
+    // Türkçe için kabaca: 0,1,2,5,7,8,9 -> 'da/de' varyasyonu; burada basit kural: ':00-:29' -> "'te", aksi "'de"
+    try{
+      const m = /^(\d{1,2}):(\d{2})$/.exec(hhmm);
+      if(!m) return `${hhmm}'de ${phrase}`;
+      const min = parseInt(m[2],10);
+      const suf = (min<=29) ? "'te" : "'de";
+      return `${hhmm}${suf} ${phrase}`;
+    }catch(e){ return `${hhmm}'de ${phrase}`; }
+  }
+
+  
+  // Basit URL otolink (http/https/www)
+  function linkify(text){
+    if(!text) return '';
+    const url = /((https?:\/\/|www\.)[\w.-]+(?:\.[\w.-]+)+(?:[\w\-\._~:\/?#\[\]@!$&'\(\)\*\+,;=.]+)?)/gi;
+    return String(text).replace(url, (m)=>{
+      const href = m.startsWith('http') ? m : 'http://' + m;
+      return '<a href="'+href+'" target="_blank">'+m+'</a>';
+    });
+  }
+async function onPrint(){
+    const d = current?.date || todayISO();
+    const parts = [];
+
+    // Saatler
+    if(current?.wakeTime) parts.push(`Saat ${current.wakeTime}'da kalktın`);
+    if(current?.breakfastTime) parts.push(`${current.breakfastTime}'te kahvaltı yaptın`);
+
+        if(current?.lunchTime) parts.push(fixSuffix(current.lunchTime, 'öğle yemeği yedin'));
+    if(current?.dinnerTime) parts.push(fixSuffix(current.dinnerTime, 'akşam yemeği yedin'));// Çalışma satırlarını hikayeye kat
+    const lines = parseStudyLines(current?.study || '');
+    if(lines.length){
+      const joined = lines.map(L => L.line).join(', ');
+      parts.push(`${joined} çalıştın`);
+    }
+
+    // Görüşmeler, izlenenler, gidilen yerler
+    if(current?.metWith?.length) parts.push(`${current.metWith.join(', ')} ile görüştün`);
+    if(current?.watched) parts.push(`${linkify(current.watched)} izledin`);
+    if(current?.reading) parts.push(`${linkify(current.reading)} okudun`);
+    if(current?.reading) parts.push(`${linkify(current.reading)} okudun`);
+    if(current?.locations) parts.push(`${current.locations} gittin`);
+
+    // Notlar (opsiyonel, kısa tut)
+    if(current?.notes) parts.push(`Not: ${linkify(current.notes)}`);
+
+    if(current?.sleepTime) parts.push(`${current.sleepTime}'de uyudun`);
+
+    const story = 'O gün ' + parts.filter(Boolean).join(', ') + '.';
+
+    // Sadece hikaye metni; aynı el yazısı font ve 22px
+    const win = window.open('','_blank');
+    const html = `
+      <html><head><meta charset="utf-8">
+      <link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap" rel="stylesheet">
+      
+<style id="remove-reports">
+/* 'Raporlar' notunu tamamen gizle */
+.page.right .note:has(#reportStart){ display:none !important; }
+/* Eski tarayıcılar için başlığa göre de gizlemeyi dene */
+.page.right .note .title:has(.section-title.marker-green:contains("Raporlar")){ display:none !important; }
+#reportStart, #reportEnd, #reportKeyword, #reportContains,
+#btnLastMonth, #btnThisMonth, #btnRunReport, #btnReportCSV,
+#reportSummary, #reportTableWrap { display:none !important; }
+
+  a{ color:#2563eb; text-decoration:underline; }
+  @media print { a { text-decoration: underline; } }
+</style>
+
+<
+<style id="v30-dateslist-align">
+  /* Kayıtlı Günler hizalama düzeltmesi */
+  #datesList{
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+  }
+  #datesList .date-item{
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+  }
+  /* Hover'da sağa kayma/tilt olmasın */
+  #datesList .date-item:hover{
+    transform: none !important;
+    background: #f1f5f9 !important;
+  }
+</style>
+/head>
+      <body style="font-family:'Reenie Beanie',cursive; font-size:24px; line-height:1.45; color:#26313a; padding:24px">
+        <div>${story}</div>
+      </body></html>`;
+    win.document.write(html);
+    win.document.close();
+    setTimeout(()=>win.print(), 350);
+  }
+
+  async function exportCSVAll(){
+    const dates=(await getAllDates()).sort();
+    const rows=[]; const header=["date","wakeTime","breakfastTime","sleepTime","study","metWith","watched","locations","notes","savedAt"]; rows.push(header.join(','));
+    for(const d of dates){ const e=await getEntry(d); if(!e) continue; const esc=(v)=>`"${String(v||'').replace(/"/g,'""')}"`; rows.push([e.date,e.wakeTime,e.breakfastTime,e.sleepTime,e.study,(e.metWith||[]).join('; '),e.watched,e.locations,e.notes,e.savedAt].map(esc).join(',')); }
+    const csv=rows.join('\\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='gunluk-veri.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
+  function matchKeyword(topic, keyword){ if(!keyword) return true; const k=keyword.trim(); if(!k) return true; if(k.startsWith('#')) return topic.toLowerCase().split(/\\s+/).some(tok=>tok===k.toLowerCase()); return topic.toLowerCase().includes(k.toLowerCase()); }
+  function formatH(m){ const h=Math.floor(m/60), mi=m%60; return `${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')}`; }
+  async function runReport(){
+    const start=reportStart.value, end=reportEnd.value, keyword=reportKeyword.value, must=(reportContains.value||'').trim().toLowerCase();
+    if(!start||!end){ reportSummary.textContent='Tarih aralığı seçmelisin.'; reportTableWrap.innerHTML=''; return; }
+    const allDates=(await getAllDates()).sort(); const filtered=allDates.filter(d=>d>=start && d<=end);
+    let totalMin=0; const trs=[];
+    for(const d of filtered){
+      const e=await getEntry(d); if(!e) continue; const lines=parseStudyLines(e.study||''); let dayMin=0; const matched=[];
+      for(const L of lines){ if(!matchKeyword(L.topic||'',keyword)) continue; if(must && !(L.line.toLowerCase().includes(must))) continue; dayMin+=(L.minutes||0); matched.push(L); }
+      if(dayMin>0){ totalMin+=dayMin; trs.push(`<tr><td>${d}</td><td>${formatH(dayMin)}</td><td>${matched.map(m=>m.line).join('<br>')}</td></tr>`); }
+    }
+    const table = `<table><thead><tr><th>Tarih</th><th>Toplam Süre</th><th>Satırlar</th></tr></thead><tbody>${trs.join('')}</tbody></table>`;
+    reportTableWrap.innerHTML = table;
+    reportSummary.textContent = `Toplam süre: ${formatH(totalMin)} (${filtered.length} gün içinde)`;
+  }
+  function lastMonthRange(){
+    const now=new Date(); const y=now.getFullYear(), m=now.getMonth();
+    const first=new Date(y, m-1, 1), last=new Date(y, m, 0);
+    const iso=(d)=>{ const tz=d.getTimezoneOffset()*60000; return new Date(d.getTime()-tz).toISOString().slice(0,10); };
+    return {start: iso(first), end: iso(last)};
+  }
+  function thisMonthRange(){
+    const now=new Date(); const y=now.getFullYear(), m=now.getMonth();
+    const first=new Date(y, m, 1), last=new Date(y, m+1, 0);
+    const iso=(d)=>{ const tz=d.getTimezoneOffset()*60000; return new Date(d.getTime()-tz).toISOString().slice(0,10); };
+    return {start: iso(first), end: iso(last)};
+  }
+
+  // Attach handlers
+  document.addEventListener('click', (e)=>{
+    const chip = e.target.closest('.chip');
+    if(chip){
+      setTheme(chip.dataset.theme);
+    }
+  });
+
+  // init after intro
+  function initApp(){
+    const dateInput=document.getElementById('date');
+    dateInput.value = todayISO();
+    loadDate(dateInput.value);
+    loadDates();
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', onSave);
+  document.getElementById('delBtn').addEventListener('click', async ()=>{ if(!current?.date) return; if(confirm(current.date+' kaydı silinsin mi?')){ await deleteEntry(current.date); current=null; await loadDates(); document.getElementById('date').value=todayISO(); await loadDate(document.getElementById('date').value); } });
+  document.getElementById('printBtn').addEventListener('click', onPrint);
+  (()=>{const el=document.getElementById('csvBtn'); if(el) el.addEventListener('click', exportCSVAll);})();
+  document.getElementById('clearBtn').addEventListener('click', ()=>{
+    const f = ['wakeTime','breakfastTime','study','metWith','watched','locations','notes','sleepTime'];
+    f.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  });
+  document.getElementById('importBtn').addEventListener('click', ()=> document.getElementById('importFile').click());
+  document.getElementById('importFile').addEventListener('change', async (e)=>{
+    const file=e.target.files?.[0]; if(!file) return;
+    try{ const text=await file.text(); const data=JSON.parse(text); await importAll(data); await loadDates(); alert('Yedek içe aktarıldı.'); }
+    catch(err){ alert('İçe aktarma hatası: '+err?.message); }
+    finally{ e.target.value=''; }
+  });
+
+  (document.getElementById('btnLastMonth')||{addEventListener:()=>{}}).addEventListener('click', ()=>{ const r=lastMonthRange(); document.getElementById('reportStart').value=r.start; document.getElementById('reportEnd').value=r.end; });
+  (document.getElementById('btnThisMonth')||{addEventListener:()=>{}}).addEventListener('click', ()=>{ const r=thisMonthRange(); document.getElementById('reportStart').value=r.start; document.getElementById('reportEnd').value=r.end; });
+  (document.getElementById('btnRunReport')||{addEventListener:()=>{}}).addEventListener('click', runReport);
+  (document.getElementById('btnReportCSV')||{addEventListener:()=>{}}).addEventListener('click', ()=>{
+    if(!document.getElementById('reportTableWrap').innerHTML.trim()){ alert('Önce raporu oluştur.'); return; }
+    const tmp=document.createElement('div'); tmp.innerHTML=document.getElementById('reportTableWrap').innerHTML;
+    const rows=[['Tarih','Toplam Süre','Satırlar']];
+    tmp.querySelectorAll('tbody tr').forEach(tr=>{
+      const t=[...tr.children].map(td=> td.innerText.replace(/\\n/g,' \\n '));
+      rows.push(t);
+    });
+    const csv = rows.map(r=> r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rapor.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+
+  // Simple "Anlat" (summarize day) without network
+  document.getElementById('askBtn').addEventListener('click', async ()=>{
+    const q = document.getElementById('askInput').value.trim();
+    const d = parseTRDatePhrase(q) || q || document.getElementById('date').value || todayISO();
+    const e = await getEntry(d);
+    if(!e){ document.getElementById('askOutput').textContent = `${d} için kayıt bulunamadı.`; return; }
+    const lines = parseStudyLines(e.study||'');
+    const total = lines.reduce((s,L)=> s+(L.minutes||0), 0);
+    const h = (m)=>{ const hh=Math.floor(m/60), mi=m%60; return `${String(hh).padStart(2,'0')}:${String(mi).padStart(2,'0')}`; };
+    const sum = [
+      `📅 ${d}`,
+      e.wakeTime? `⏰ Kalkış: ${e.wakeTime}`: null,
+      e.breakfastTime? `☕ Kahvaltı: ${e.breakfastTime}`: null,
+      e.sleepTime? `🌙 Yatma: ${e.sleepTime}`: null,
+      lines.length? `🧱 Çalışma: ${lines.map(L=>L.line).join(' | ')}`: null,
+      e.metWith?.length? `👥 Görüştükleri: ${e.metWith.join(', ')}`: null,
+      e.watched? `🎬 İzledikleri: ${e.watched}`: null,
+      e.locations? `📍 Gittiği yerler: ${e.locations}`: null,
+      e.notes? `📝 Notlar: ${e.notes}`: null,
+      total? `⏳ Toplam çalışma: ${h(total)}`: null
+    ].filter(Boolean).join('\\n');
+    document.getElementById('askOutput').textContent = sum;
+  });
+
+  // init when desk is visible (after intro)
+  const observer = new MutationObserver(() => {
+    const wrap = document.getElementById('deskWrap');
+    if (wrap && wrap.style.display === 'block') {
+      initApp();
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+</script>
+</body>
+</html>
